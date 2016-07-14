@@ -1,0 +1,71 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 29007
+ * Date: 7/8/2016
+ * Time: 12:52 PM
+ */
+
+/*
+ * This is just here to verify that my module loaded
+ */
+/*
+ function rlh_datalayer_init() {
+   global $user;
+}
+*/
+
+/**
+ * Implements hook_menu().
+ */
+function rlh_datalayer_menu() {
+  $items = array();
+  $items['test-form'] = array(
+    'title' => 'Data Layer Test Form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rlh_datalayer_test_form'),
+    'access callback' => TRUE,
+    'description' => 'Demonstrates form interaction with data layer',
+    'type' => MENU_CALLBACK,
+    'file' => 'form.inc',
+  );
+
+  return $items;
+
+}
+
+
+//Example of programatically adding data to the dataLayer from the
+//backend
+function rlh_datalayer_preprocess_page(&$variables) {
+  global $user;
+  if (!user_is_anonymous()) {
+    $account = user_load($user->uid);
+    $field_first_name = field_get_items('user', $account, 'field_first_name');
+    if ($field_first_name) {
+      $first_name = $field_first_name[0]['value'];
+    }
+    $field_last_name = field_get_items('user', $account, 'field_last_name');
+    if ($field_last_name) {
+      $last_name = $field_last_name[0]['value'];
+    }
+
+    datalayer_add(array(
+      'userFirstName' => $first_name,
+      'userLastName' => $last_name,
+    ));
+  }
+
+  //add my client side javascript
+  drupal_add_js(drupal_get_path('module', 'rlh_datalayer') . '/js/rlh_datalayer.js');
+}
+
+//Here's a sample form to demonstrate putting events into the datalayer
+
+
+//This only appears to fire on the admin page.
+//After having printed out the properties, I'm not really sure
+//what it does.
+function rlh_datalayer_datalayer_meta_alter(&$properties) {
+  //dpm($properties);
+}

@@ -1,0 +1,4 @@
+name = RLH Datalayer
+description = "Provides data and events for datalayer tests."
+core = 7.x
+dependencies[] = datalayer
